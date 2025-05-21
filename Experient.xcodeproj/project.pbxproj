@@ -29,9 +29,35 @@
 		227B23092DDCAC4D00A5E4BC /* ExperientUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExperientUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		4C76A9B82DDE32CD008F56D2 /* Exceptions for "Experient" folder in "ExperientTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Model/AuthResponse.swift,
+				Model/RefreshTokenResponse.swift,
+				Model/User.swift,
+				Service/AuthManager.swift,
+				Service/AuthServiceProtocol.swift,
+				Service/KeychainStoreService.swift,
+				Service/MockAuthService.swift,
+				Service/MockStoreService.swift,
+				Service/StoreServiceProtocol.swift,
+				"Utils/Data+Base64URL.swift",
+				Utils/JWTDecoder.swift,
+				Utils/JWTEncoder.swift,
+				Utils/JWTGenerator.swift,
+				"Utils/String+Base64URL.swift",
+			);
+			target = 227B22FE2DDCAC4D00A5E4BC /* ExperientTests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		227B22F02DDCAC4C00A5E4BC /* Experient */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4C76A9B82DDE32CD008F56D2 /* Exceptions for "Experient" folder in "ExperientTests" target */,
+			);
 			path = Experient;
 			sourceTree = "<group>";
 		};
@@ -392,7 +418,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Experient/Preview Content\"";
-				DEVELOPMENT_TEAM = TT3T6DMYKU;
+				DEVELOPMENT_TEAM = R76UR2Y2GL;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -431,7 +457,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Experient/Preview Content\"";
-				DEVELOPMENT_TEAM = TT3T6DMYKU;
+				DEVELOPMENT_TEAM = R76UR2Y2GL;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -467,7 +493,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = TT3T6DMYKU;
+				DEVELOPMENT_TEAM = R76UR2Y2GL;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MACOSX_DEPLOYMENT_TARGET = 14.7;
@@ -490,7 +516,7 @@
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = TT3T6DMYKU;
+				DEVELOPMENT_TEAM = R76UR2Y2GL;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MACOSX_DEPLOYMENT_TARGET = 14.7;
@@ -512,7 +538,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = TT3T6DMYKU;
+				DEVELOPMENT_TEAM = R76UR2Y2GL;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MACOSX_DEPLOYMENT_TARGET = 14.7;
@@ -534,7 +560,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = TT3T6DMYKU;
+				DEVELOPMENT_TEAM = R76UR2Y2GL;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
 				MACOSX_DEPLOYMENT_TARGET = 14.7;
