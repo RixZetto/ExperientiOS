@@ -7,12 +7,18 @@
 
 class MockStoreService: StoreServiceProtocol {
     
+    var userName: String?
     var accessToken: String?
     var refreshToken: String?
     
     func clear() {
+        self.userName = nil
         self.accessToken = nil
         self.refreshToken = nil
+    }
+    
+    func saveUserName(_ name: String) {
+        self.userName = name
     }
     
     func saveAccessToken(_ accessToken: String) {
@@ -21,6 +27,10 @@ class MockStoreService: StoreServiceProtocol {
     
     func saveRefreshToken(_ refreshToken: String) {
         self.refreshToken = refreshToken
+    }
+    
+    func readUserName() -> String? {
+        return self.userName
     }
     
     func readAccessToken() -> String? {

@@ -9,17 +9,21 @@ import Foundation
 
 class KeychainStoreService: StoreServiceProtocol {
     private let service = "com.experiente.challenge.rrodriguez"
+    private let firstNameKey = "user.firstname"
     private let accessTokenKey = "accessToken"
     private let refreshTokenKey = "refreshToken"
-    private let expirationKey = "expiration"
     
     init() {}
     
     // MARK: Public Methods
     func clear() {
+        self.delete(forKey: firstNameKey)
         self.delete(forKey: accessTokenKey)
         self.delete(forKey: refreshTokenKey)
-        self.delete(forKey: expirationKey)
+    }
+    
+    func saveUserName(_ name: String) {
+        self.store(name, forKey: firstNameKey)
     }
     
     func saveAccessToken(_ accessToken: String) {
@@ -30,10 +34,8 @@ class KeychainStoreService: StoreServiceProtocol {
         self.store(refreshToken, forKey: refreshTokenKey)
     }
     
-    func saveExpiration(_ expiration: Date) {
-        let dateFormatter = ISO8601DateFormatter()
-        let expirationString = dateFormatter.string(from: expiration)
-        self.store(expirationString, forKey: expirationKey)
+    func readUserName() -> String? {
+        return self.read(forKey: firstNameKey)
     }
     
     func readAccessToken() -> String? {
@@ -42,12 +44,6 @@ class KeychainStoreService: StoreServiceProtocol {
     
     func readRefreshToken() -> String? {
         return self.read(forKey: refreshTokenKey)
-    }
-    
-    func readExpiration() -> Date? {
-        guard let expirationString = self.read(forKey: expirationKey) else { return nil }
-        let dateFormatter = ISO8601DateFormatter()
-        return dateFormatter.date(from: expirationString)
     }
     
     // MARK: Private methods
@@ -74,7 +70,7 @@ class KeychainStoreService: StoreServiceProtocol {
     }
     
     private func read(forKey key: String) -> String? {
-        var query: [String: Any] = [
+        let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: key,

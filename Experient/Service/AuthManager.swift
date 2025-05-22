@@ -5,9 +5,12 @@
 //  Created by Ricardo Rodríguez on 21/05/25.
 //
 import Foundation
+import SwiftUI
 
 class AuthManager: ObservableObject {
+    @Published var isValidating: Bool = true
     @Published var isAuthenticated: Bool = false
+    @Published var userFirstName: String? // only storing the username to reused after login
     private var expirationDate: Date?
     
     private var authService: AuthServiceProtocol
@@ -16,12 +19,10 @@ class AuthManager: ObservableObject {
     init(authService: AuthServiceProtocol, storeService: StoreServiceProtocol) {
         self.authService = authService
         self.storeService = storeService
-        
-        // initialize
-        self.initialize()
     }
     
     // MARK: - Login
+    
     func login(username: String, password: String) async throws {
         guard !username.isEmpty, !password.isEmpty else {
             throw AuthError.invalidCredentials
@@ -29,9 +30,9 @@ class AuthManager: ObservableObject {
         
         do {
             let response = try await authService.authenticate(username: username, password: password)
-            try self.setupToken(response: response)
+            try await self.setupToken(response: response)
         }
-        catch let _ as AuthServiceError {
+        catch _ as AuthServiceError {
             throw AuthError.invalidCredentials
         }
         
@@ -39,23 +40,32 @@ class AuthManager: ObservableObject {
     
     // MARK: - Logout
     
-    func logout() {
-        self.clearTokens()
+    func logout() async {
+        await self.clearTokens()
     }
     
     // MARK: - Private methods
     
     /// Load token from keychain and get the expiration date
-    private func initialize() {
+    @MainActor
+    func initialize() async {
         guard let accessToken = self.storeService.readAccessToken() else {
+            self.isValidating = false
             return
         }
         
         self.expirationDate = JWTDecoder().decodeJWTExpiration(from: accessToken)
+        self.isAuthenticated = await self.validateSession()
     }
     
     /// Validate access Token expiration date and check if it can be refreshed
+    @MainActor
     private func validateSession() async -> Bool {
+        defer {
+            self.isValidating = false
+        }
+        
+        self.isValidating = true
         guard let expirationDate = expirationDate else {
             return false
         }
@@ -65,6 +75,15 @@ class AuthManager: ObservableObject {
         }
         
         guard let refreshToken = self.storeService.readRefreshToken() else {
+            return false
+        }
+        
+        guard let refreshTokenExpirationDate = JWTDecoder().decodeJWTExpiration(from: refreshToken) else {
+            return false
+        }
+        
+        if refreshTokenExpirationDate < Date() {
+            // refresh token has expired
             return false
         }
         
@@ -78,25 +97,28 @@ class AuthManager: ObservableObject {
         }
     }
     
-    private func scheduleRefreshToken() {
-        
-    }
     
     /// Setup all tokens after login
-    private func setupToken(response: AuthResponse) throws {
+    @MainActor
+    private func setupToken(response: AuthResponse) async throws {
         let accessToken = response.accessToken
         let refreshToken = response.refreshToken
         
+        self.storeService.saveUserName(response.user.firstName)
         self.storeService.saveAccessToken(accessToken)
         self.storeService.saveRefreshToken(refreshToken)
         self.expirationDate = JWTDecoder().decodeJWTExpiration(from: accessToken)
+        
+        self.userFirstName = response.user.firstName
         self.isAuthenticated = true
     }
     
     /// Clear all tokens after logout
-    private func clearTokens() {
+    @MainActor
+    private func clearTokens() async {
         self.storeService.clear()
         self.expirationDate = nil
+        
         self.isAuthenticated = false
     }
     
