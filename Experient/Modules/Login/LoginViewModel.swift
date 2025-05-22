@@ -37,6 +37,11 @@ class LoginViewModel: ObservableObject {
     
     @MainActor
     func login() async {
+        if !isFormValid {
+            loginError = "Please fill in both fields."
+            return
+        }
+        
         isLoggingIn = true
         try? await Task.sleep(nanoseconds: 1_000_000_000) // simulate 1 seconds
         do {

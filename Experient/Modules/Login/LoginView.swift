@@ -100,7 +100,7 @@ struct LoginView: View {
                         Color.pink
                     )
                     .cornerRadius(8)
-                    .disabled(!viewModel.isFormValid || viewModel.isLoggingIn)
+                    .disabled(viewModel.isLoggingIn)
                     .contentShape(Rectangle())
                     
                     
