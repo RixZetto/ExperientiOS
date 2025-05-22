@@ -12,30 +12,32 @@ struct AuthManagerTests {
     @Test func testLogin_Success_UpdatesIsLoggedInState() async throws {
         let keychainService = MockStoreService()
         
-        let authManager = await AuthManager(
+        let authManager = AuthManager(
             authService: MockAuthService(),
-            storeService: keychainService
+            storeService: keychainService,
+            router: AppRouter()
         )
         
-        await #expect(authManager.isAuthenticated == false)
+        #expect(authManager.isAuthenticated == false)
         try await authManager.login(username: "vshah", password: "password")
-        await #expect(authManager.isAuthenticated == true)
+        #expect(authManager.isAuthenticated == true)
     }
     
     @Test func testRefreshToken_Success_GeneratesANewAccessToken() async throws {
         let keychainService = MockStoreService()
         keychainService.clear()
         
-        let authManager = await AuthManager(
+        let authManager = AuthManager(
             authService: MockAuthService(
                 accessTokenExpirationInSeconds: 10 // simulate 5 seconds to invalidate accessToken
             ),
-            storeService: keychainService
+            storeService: keychainService,
+            router: AppRouter()
         )
         
         try await authManager.login(username: "vshah", password: "password")
         
-        await #expect(authManager.isAuthenticated == true)
+        #expect(authManager.isAuthenticated == true)
         
         let initialAccessToken = keychainService.readAccessToken()
         

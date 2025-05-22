@@ -23,10 +23,6 @@ class MockAuthService: AuthServiceProtocol {
             throw AuthServiceError.invalidCredentials
         }
         
-        if username.lowercased() != "vshah" || password != "password" {
-            throw AuthServiceError.invalidCredentials
-        }
-        
         let json = """
 {
 "username": "VShah",
@@ -53,11 +49,11 @@ class MockAuthService: AuthServiceProtocol {
         
         let accessToken = JWTGenerator.generate(
             name: "Internal Access Token",
-            expirationInSeconds: accessTokenExpirationInSeconds) // 5 min
+            expirationInSeconds: accessTokenExpirationInSeconds) // by default: 5 min
         
         let refreshToken = JWTGenerator.generate(
             name: "Refresh Token",
-            expirationInSeconds: refreshTokenExpirationInSeconds) // 7 days
+            expirationInSeconds: refreshTokenExpirationInSeconds) // by default: 7 days
         
         return AuthResponse(
             user: user,
@@ -70,7 +66,11 @@ class MockAuthService: AuthServiceProtocol {
     }
     
     func refreshAccessToken(with refreshToken: String) async -> RefreshTokenResponse {
-        return RefreshTokenResponse(accessToken: "")
+        let accessToken = JWTGenerator.generate(
+            name: "Internal Access Token",
+            expirationInSeconds: accessTokenExpirationInSeconds) // by default: 5 min
+        
+        return RefreshTokenResponse(accessToken: accessToken)
     }
     
 }

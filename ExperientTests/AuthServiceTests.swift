@@ -23,7 +23,7 @@ struct AuthServiceTests {
         let authService: AuthServiceProtocol = MockAuthService()
         do {
             _ = try await authService.authenticate(
-                username: "vshah", password: "123123")
+                username: "vshah", password: "")
             #expect(Bool(false), "Expected authentication to fail")
         } catch let error as AuthServiceError {
             #expect(error == .invalidCredentials)

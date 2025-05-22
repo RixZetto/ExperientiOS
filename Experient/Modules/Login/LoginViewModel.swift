@@ -49,7 +49,7 @@ class LoginViewModel: ObservableObject {
     }
     
     func showAbout() {
-        isAboutPresented = true
+        self.isAboutPresented = true
     }
     
 }

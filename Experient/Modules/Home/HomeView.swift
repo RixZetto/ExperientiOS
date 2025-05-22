@@ -8,12 +8,13 @@
 import SwiftUI
 
 struct HomeView: View {
+    @EnvironmentObject var dependencies: DependencyInjector
     @StateObject var coordinator = HomeCoordinator()
     
     var body: some View {
         NavigationStack {
             TabView(selection: $coordinator.selectedTab) {
-                DashboardView()
+                DashboardView(authManager: dependencies.makeAuthManager())
                     .tabItem {
                         Label(HomeTab.dashboard.title, systemImage: HomeTab.dashboard.icon)
                     }

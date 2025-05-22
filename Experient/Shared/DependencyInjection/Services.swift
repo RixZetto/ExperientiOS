@@ -11,8 +11,8 @@ class Services {
     let storeService: StoreServiceProtocol
     
     init() {
-        self.authService = MockAuthService()
-        self.storeService = MockStoreService()
+        self.authService = MockAuthService(accessTokenExpirationInSeconds: 5 * 60) // default 5 min, for simulation and expire token
+        self.storeService = KeychainStoreService()
     }
     
 }

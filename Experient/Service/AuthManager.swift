@@ -11,14 +11,25 @@ class AuthManager: ObservableObject {
     @Published var isValidating: Bool = true
     @Published var isAuthenticated: Bool = false
     @Published var userFirstName: String? // only storing the username to reused after login
-    private var expirationDate: Date?
+    @Published var accessTokenExpirationDate: Date? {
+        didSet {
+            if let accessTokenExpirationDate = accessTokenExpirationDate {
+                self.startRefreshTimer(expiration: accessTokenExpirationDate)
+            }
+        }
+    }
+    @Published var refreshTokenExpirationDate: Date?
+    private var refreshTimer: Timer?
     
     private var authService: AuthServiceProtocol
     private var storeService: StoreServiceProtocol
+    private var router: AppRouter
     
-    init(authService: AuthServiceProtocol, storeService: StoreServiceProtocol) {
+    
+    init(authService: AuthServiceProtocol, storeService: StoreServiceProtocol, router: AppRouter) {
         self.authService = authService
         self.storeService = storeService
+        self.router = router
     }
     
     // MARK: - Login
@@ -48,14 +59,38 @@ class AuthManager: ObservableObject {
     
     /// Load token from keychain and get the expiration date
     @MainActor
-    func initialize() async {
-        guard let accessToken = self.storeService.readAccessToken() else {
+    func bootstrap() async {
+        guard let accessToken = self.storeService.readAccessToken(),
+              let refreshToken = self.storeService.readRefreshToken()
+        else {
+            self.router.reset(to: .login)
             self.isValidating = false
             return
         }
         
-        self.expirationDate = JWTDecoder().decodeJWTExpiration(from: accessToken)
-        self.isAuthenticated = await self.validateSession()
+        self.accessTokenExpirationDate = JWTDecoder().decodeJWTExpiration(from: accessToken)
+        self.refreshTokenExpirationDate = JWTDecoder().decodeJWTExpiration(from: refreshToken)
+        
+        let isValidSession = await self.validateSession()
+        self.isAuthenticated = isValidSession
+        if isValidSession {
+            self.router.reset(to: .home)
+        } else {
+            self.router.reset(to: .login)
+        }
+    }
+    
+    private func startRefreshTimer(expiration: Date) {
+        self.refreshTimer?.invalidate()
+        
+        let interval = expiration.timeIntervalSinceNow
+        self.refreshTimer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
+            Task {
+                if await self?.validateSession() == false {
+                    await self?.logout()
+                }
+            }
+        }
     }
     
     /// Validate access Token expiration date and check if it can be refreshed
@@ -66,11 +101,8 @@ class AuthManager: ObservableObject {
         }
         
         self.isValidating = true
-        guard let expirationDate = expirationDate else {
-            return false
-        }
         
-        if expirationDate > Date() {
+        if self.accessTokenExpirationDate != nil && self.accessTokenExpirationDate! > Date() {
             return true // token is still alive
         }
         
@@ -90,7 +122,7 @@ class AuthManager: ObservableObject {
         do {
             let refreshResponse = try await self.authService.refreshAccessToken(with: refreshToken)
             self.storeService.saveAccessToken(refreshResponse.accessToken)
-            self.expirationDate = JWTDecoder().decodeJWTExpiration(from: refreshResponse.accessToken)
+            self.accessTokenExpirationDate = JWTDecoder().decodeJWTExpiration(from: refreshResponse.accessToken)
             return true
         } catch {
             return false
@@ -107,19 +139,21 @@ class AuthManager: ObservableObject {
         self.storeService.saveUserName(response.user.firstName)
         self.storeService.saveAccessToken(accessToken)
         self.storeService.saveRefreshToken(refreshToken)
-        self.expirationDate = JWTDecoder().decodeJWTExpiration(from: accessToken)
-        
+        self.accessTokenExpirationDate = JWTDecoder().decodeJWTExpiration(from: accessToken)
+        self.refreshTokenExpirationDate = JWTDecoder().decodeJWTExpiration(from: refreshToken)
         self.userFirstName = response.user.firstName
         self.isAuthenticated = true
+        self.router.reset(to: .home)
     }
     
     /// Clear all tokens after logout
     @MainActor
     private func clearTokens() async {
         self.storeService.clear()
-        self.expirationDate = nil
+        self.accessTokenExpirationDate = nil
         
         self.isAuthenticated = false
+        self.router.reset(to: .login)
     }
     
 }

@@ -36,17 +36,18 @@
 				Model/AuthResponse.swift,
 				Model/RefreshTokenResponse.swift,
 				Model/User.swift,
+				Router/AppRouter.swift,
 				Service/AuthManager.swift,
 				Service/AuthServiceProtocol.swift,
 				Service/KeychainStoreService.swift,
 				Service/MockAuthService.swift,
 				Service/MockStoreService.swift,
 				Service/StoreServiceProtocol.swift,
-				"Utils/Data+Base64URL.swift",
-				Utils/JWTDecoder.swift,
-				Utils/JWTEncoder.swift,
-				Utils/JWTGenerator.swift,
-				"Utils/String+Base64URL.swift",
+				"Shared/Utils/Data+Base64URL.swift",
+				Shared/Utils/JWTDecoder.swift,
+				Shared/Utils/JWTEncoder.swift,
+				Shared/Utils/JWTGenerator.swift,
+				"Shared/Utils/String+Base64URL.swift",
 			);
 			target = 227B22FE2DDCAC4D00A5E4BC /* ExperientTests */;
 		};
